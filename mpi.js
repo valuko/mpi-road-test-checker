@@ -1,7 +1,7 @@
 // Configuracoes de busca
-const DESIRED_DATES_RANGE = { 'min': '29 May, 2019', 'max': '05 Jun, 2019' };
+const DESIRED_DATES_RANGE = { 'min': '11 Jun, 2019', 'max': '22 Jun, 2019' };
 const DESIRED_LOCATION = 'Bison Service Centre'
-const SEARCH_DATES_LOOP = ['29 May, 2019', '30 May, 2019', '31 Jun, 2019', '01 Jun, 2019', '02 Jun, 2019', '03 Jun, 2019', '04 Jun, 2019'];
+const SEARCH_DATES_LOOP = ['11 Jun, 2019', '15 Jun, 2019', '22 Jun, 2019', '29 Jun, 2019'];
 
 // Evita a sessao cair
 clearInterval(_viewSessionInterval);
@@ -22,6 +22,29 @@ class InfiniteLoop {
         this.i = (this.i >= this.items.length - 1) ? 0 : this.i + 1;
 
         return this.items[c]
+    }
+}
+
+function notifyMe(message) {
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+        alert("This browser does not support system notifications");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+        // If it's okay let's create a notification
+        var notification = new Notification(message);
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                var notification = new Notification(message);
+            }
+        });
     }
 }
 
@@ -55,7 +78,7 @@ $(document).ajaxComplete(function (event, request, settings) {
 
             if (availableDate >= desiredDateMin && availableDate <= desiredDateMax) {
                 beep.play();
-                alert('Vejas essa data ' + data.Date);
+                notifyMe('Veja essa data ' + data.Date);
                 beep.pause();
 
                 if (!confirm('Deseja continuar procurando?')) return true;
@@ -66,4 +89,6 @@ $(document).ajaxComplete(function (event, request, settings) {
     setTimeout(checkDates, 5000);
 });
 const loopDates = new InfiniteLoop(SEARCH_DATES_LOOP);
+notifyMe("Ola, estamos testando sua janela de notificacoes");
 checkDates();
+
