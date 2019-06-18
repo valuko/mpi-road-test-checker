@@ -1,12 +1,13 @@
 // Configuracoes de busca
-const DESIRED_DATES_RANGE = { 'min': '11 Jun, 2019', 'max': '22 Jun, 2019' };
+const DESIRED_DATES_RANGE = { 'min': '29 Jun, 2019', 'max': '06 Jul, 2019' };
 const DESIRED_LOCATION = 'Bison Service Centre'
-const SEARCH_DATES_LOOP = ['11 Jun, 2019', '15 Jun, 2019', '22 Jun, 2019', '29 Jun, 2019'];
+const SEARCH_DATES_LOOP = ['29 Jun, 2019', '06 Jul, 2019'];
+const IGNORELIST = [];
 
 // Evita a sessao cair
 clearInterval(_viewSessionInterval);
 
-// Alerta sonoro 
+// Alerta sonoro
 let beep = new Audio("https://www.soundjay.com/button/beep-01a.mp3");
 
 // Iterador infinito
@@ -68,6 +69,7 @@ function checkDates() {
 $(document).ajaxComplete(function (event, request, settings) {
     event.preventDefault();
     jQuery('#search-submit').removeAttr('disabled');
+	let stop = false;
 
     try {
 
@@ -76,19 +78,19 @@ $(document).ajaxComplete(function (event, request, settings) {
             let desiredDateMax = new Date(DESIRED_DATES_RANGE.max);
             let availableDate = new Date(data.Date);
 
-            if (availableDate >= desiredDateMin && availableDate <= desiredDateMax) {
+            if (IGNORELIST.indexOf(availableDate.getTime()) === -1 && (availableDate >= desiredDateMin && availableDate <= desiredDateMax)) {
                 beep.play();
                 notifyMe('Veja essa data ' + data.Date);
                 beep.pause();
 
-                if (!confirm('Deseja continuar procurando?')) return true;
+                if (!confirm('Deseja continuar procurando?')){ stop = true; }
+				else {IGNORELIST.push(availableDate.getTime())};
             }
         })
     } catch (e) { console.error(e) }
 
-    setTimeout(checkDates, 5000);
+    stop ? null : setTimeout(checkDates, 5000);
 });
 const loopDates = new InfiniteLoop(SEARCH_DATES_LOOP);
 notifyMe("Ola, estamos testando sua janela de notificacoes");
 checkDates();
-
