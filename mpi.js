@@ -91,6 +91,9 @@ $(document).ajaxComplete(function (event, request, settings) {
 
     stop ? null : setTimeout(checkDates, 5000);
 });
+window.onbeforeunload = function() {
+   return "Do you really want to leave MPI page?";
+};
 const loopDates = new InfiniteLoop(SEARCH_DATES_LOOP);
 notifyMe("Ola, estamos testando sua janela de notificacoes");
 checkDates();
